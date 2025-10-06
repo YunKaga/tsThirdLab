@@ -7,7 +7,7 @@ on:
 
 env:
   Version_Project: "0.0.1"
-  Version_Release: "1"
+  Version_Release: "0.0.1"
 
 jobs:
   build-linux:
@@ -19,7 +19,7 @@ jobs:
           submodules: true
 
       - name: Configure CMake
-        run: cmake -B build . -DPATCH_VERSION=${{ env.Version_Project }}
+        run: cmake -B build . -DPATCH_VERSION="${{ env.Version_Project }}"
 
       - name: Building
         run: cmake --build build
@@ -46,7 +46,7 @@ jobs:
 
       - name: Configure with CMake
         run: |
-          cmake -B build . -DPATCH_VERSION=${{ env.Version_Project }}
+          cmake -B build . -DPATCH_VERSION="${{ env.Version_Project }}"
 
       - name: Build project
         run: cmake --build build --config Release
@@ -82,8 +82,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.Version_Release }}
-          release_name: Release ${{ env.Version_Release }}
+          tag_name: "${{ env.Version_Release }}"
+          release_name: Release "${{ env.Version_Release }}"
           draft: false
           prerelease: false
 
