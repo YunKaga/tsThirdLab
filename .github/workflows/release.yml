@@ -46,7 +46,7 @@ jobs:
 
       - name: Configure with CMake
         run: |
-          cmake -B build . -DPATCH_VERSION=1
+          cmake -B build . -DPATCH_VERSION=${{ env.Version_Project }}
 
       - name: Build project
         run: cmake --build build --config Release
@@ -82,7 +82,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 1
+          tag_name: ${{ env.Version_Release }}
           release_name: Release ${{ env.Version_Release }}
           draft: false
           prerelease: false
