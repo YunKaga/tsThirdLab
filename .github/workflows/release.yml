@@ -1,10 +1,13 @@
-name: 'laba 2'
+name: 'laba 3'
 
 on:
   push:
     branches:
       - main
-      - feature/github_actions
+
+env:
+  Version_Project: 0.0.1
+  Version_Release: 1
 
 jobs:
   build-linux:
@@ -16,7 +19,7 @@ jobs:
           submodules: true
 
       - name: Configure CMake
-        run: cmake -B build . -DPATCH_VERSION=${{ github.run_number }}
+        run: cmake -B build . -DPATCH_VERSION=${{ env.Version_Project }}
 
       - name: Building
         run: cmake --build build
@@ -31,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-package
-          path: build/lb3-0.0.${{ github.run_number }}-Linux.deb
+          path: build/lb3-${{ env.Version_Project }}-Linux.deb
 
   build-windows:
     runs-on: windows-latest
@@ -43,20 +46,20 @@ jobs:
 
       - name: Configure with CMake
         run: |
-          cmake -B build . -DPATCH_VERSION=${{ github.run_number }}
+          cmake -B build . -DPATCH_VERSION=1
 
       - name: Build project
         run: cmake --build build --config Release
 
       - name: Create zip
         run: |
-          Compress-Archive -Path ./build/lb3.exe -DestinationPath containers-0.0.${{ github.run_number }}.zip
+          Compress-Archive -Path ./build/Release/lb3.exe -DestinationPath containers-${{ env.Version_Project }}.zip
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-package
-          path: ./containers-0.0.${{ github.run_number }}.zip
+          path: ./containers-${{ env.Version_Project }}.zip
 
   create-release:
     runs-on: ubuntu-latest
@@ -79,8 +82,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          tag_name: 1
+          release_name: Release ${{ env.Version_Release }}
           draft: false
           prerelease: false
 
@@ -90,8 +93,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./lb3-0.0.${{ github.run_number }}-Linux.deb
-          asset_name: lb3-0.0.${{ github.run_number }}-Linux.deb
+          asset_path: ./lb3-${{ env.Version_Project }}-Linux.deb
+          asset_name: lb3-${{ env.Version_Project }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
 
       - name: Upload Windows Release Asset
@@ -100,6 +103,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./containers.0.0.${{ github.run_number }}.zip
-          asset_name: containers-0.0.{{ github.run_number }}.zip
+          asset_path: ./containers-${{ env.Version_Project }}.zip
+          asset_name: containers-${{ env.Version_Project }}.zip
           asset_content_type: application/x-msdownload
